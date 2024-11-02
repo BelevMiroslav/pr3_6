@@ -1,5 +1,3 @@
-// Pokemon.js
-
 export class Pokemon {
     constructor(name, level, maxHealth, progressBarId, healthTextId, attacks) {
         this.name = name;
@@ -11,14 +9,21 @@ export class Pokemon {
         this.attacks = attacks;
     }
 
-    attack(target, damage) {
+    attack(target) {
+        const damage = this.calculateDamage();
         target.takeDamage(damage);
         this.logAction(`${this.name} атакує та завдає ${damage} пошкоджень ${target.name}! ${target.name} має ${target.health} HP залишилося.`);
     }
 
-    specialAttack(target, damage) {
+    specialAttack(target) {
+        const damage = this.calculateDamage(true);
         target.takeDamage(damage);
         this.logAction(`${this.name} використовує Special Attack і завдає ${damage} пошкоджень ${target.name}! ${target.name} має ${target.health} HP залишилося.`);
+    }
+
+    calculateDamage(isSpecial = false) {
+        const attack = isSpecial ? this.attacks[1] : this.attacks[0];
+        return Math.floor(Math.random() * (attack.maxDamage - attack.minDamage + 1)) + attack.minDamage;
     }
 
     enemyAttack(target) {
@@ -26,11 +31,8 @@ export class Pokemon {
             console.error(`${this.name} не має доступних атак!`);
             return;
         }
-        const firstAttack = this.attacks[0];
-        const damage = Math.floor(Math.random() * (firstAttack.maxDamage - firstAttack.minDamage + 1)) + firstAttack.minDamage;
-        this.attack(target, damage);
+        this.attack(target);
     }
-    
 
     takeDamage(amount) {
         this.health = Math.max(0, this.health - amount);
@@ -46,7 +48,6 @@ export class Pokemon {
         this.progressBar.style.width = `${healthPercentage}%`;
         this.healthText.textContent = `${this.health} / ${this.maxHealth}`;
     }
-    
 
     logAction(message) {
         const logEntry = document.createElement("div");
